@@ -1,0 +1,5 @@
+body { background-color:#fff; color:#333; font:16px/1.5 "Trebuchet MS", "Geneva CE", lucida, sans-serif; }
+#header, #content, #footer { border: 1px dotted gray; margin:5px auto; padding:1em; width:770px; }
+a[href^="error:"] { background-color:red; color:white; padding:0.05em 0.2em; }
+div.flash { background-color:#fff9d7; border:1px solid #e2c822; color:black; margin:1em 0; padding:1em; }
+form table th { text-align:right; }
