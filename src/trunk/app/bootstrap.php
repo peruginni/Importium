@@ -15,36 +15,42 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Configuration;
 
 
-// Step 1: Load Nette Framework
-// this allows load Nette Framework classes automatically so that
-// you don't have to litter your code with 'require' statements
+/**
+ * Step 1: Load Nette Framework
+ */
 require LIBS_DIR . '/Nette/loader.php';
 
-
-
-// Step 2: Configure environment
-// 2a) enable Nette\Debug for better exception and error visualisation
+/**
+ * Step 2: Configure environment
+ * 2a) enable Nette\Debug for better exception and error visualisation
+ */
 Debug::enable();
 
-// 2b) load configuration from config.ini file
+/**
+ * 2b) load configuration from config.ini file
+ */
 Environment::loadConfig();
 
-
-
-// Step 3: Configure application
-// 3a) get and setup a front controller
+/**
+ * Step 3: Configure application
+ * 3a) get and setup a front controller
+ */
 $application = Environment::getApplication();
 $application->errorPresenter = 'Error';
 $application->catchExceptions = false;
 
-// 3b) initialize data
-$dataInitializator = new CMS\DataInitializator(
-    Environment::getConfig('dataInitializator')
+/**
+ * 3b) initialize data
+ */
+$dataInitializator = new DataInitializator();
+$dataInitializator->setGenerationStrategy(
+    DataInitializator::DROP_AND_CREATE
 );
 $dataInitializator->run();
 
-
-// Step 4: Setup application router
+/**
+ * Step 4: Setup application router
+ */
 $router = $application->getRouter();
 
 if (function_exists('apache_get_modules') && in_array('mod_rewrite', apache_get_modules())) {
@@ -68,7 +74,7 @@ if (function_exists('apache_get_modules') && in_array('mod_rewrite', apache_get_
 		'id' => NULL,
 	));
 
-    // add translation tables
+// add translation tables
 //    Route::setStyleProperty('presenter', Route::FILTER_TABLE, array(
 //            'produkt' => 'Product',
 //            'kosik' => 'Basket',
@@ -78,6 +84,8 @@ if (function_exists('apache_get_modules') && in_array('mod_rewrite', apache_get_
 	$router[] = new SimpleRouter('Front:Default:default');
 }
 
-
-// Step 5: Run the application!
+/**
+ * Step 5: Run the application!
+ */
 $application->run();
+

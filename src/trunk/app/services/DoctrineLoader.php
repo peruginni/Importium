@@ -4,12 +4,10 @@ namespace CMS;
 
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManager;
-use Doctrine\Common\Cache\XcacheCache;
-use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
-use Doctrine\Common\EventManager;
 use Doctrine\ORM\Events;
-use Nette\Environment;
-
+use Doctrine\ORM\Event\LoadClassMetadataEventArgs;
+use Doctrine\Common\Cache\XcacheCache;
+use Doctrine\Common\EventManager;
 
 /**
  * DoctrineLoader
@@ -27,16 +25,16 @@ class DoctrineLoader extends \Nette\Object
 
     public function __construct($options)
     {
-        if($options['connection']) {
+        if(isset($options['connection'])) {
             $this->setConnectionOptions($options['connection']);
         }
-        if($options['entityDir']) {
+        if(isset($options['entityDir'])) {
             $this->setEntityDir($options['entityDir']);
         }
-        if($options['proxyDir']) {
+        if(isset($options['proxyDir'])) {
             $this->setProxyDir($options['proxyDir']);
         }
-        if($options['prefix']) {
+        if(isset($options['prefix'])) {
             $this->setPrefix($options['prefix']);
         }
     }
@@ -97,11 +95,6 @@ class DoctrineLoader extends \Nette\Object
         if($this->entityManager == null) {
             $config = $this->createConfiguration();
             $options = $this->getConnectionOptions();
-
-//            $evm = new EventManager;
-//            $evm->addEventListener(Events::loadClassMetadata, $this);
-//
-//            $this->entityManager = EntityManager::create($options, $config, $evm);
             $this->entityManager = EntityManager::create($options, $config);
         }
         return $this->entityManager;
@@ -141,6 +134,3 @@ class DoctrineLoader extends \Nette\Object
     }
 
 }
-
-
-
