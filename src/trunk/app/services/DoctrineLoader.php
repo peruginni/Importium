@@ -2,6 +2,7 @@
 
 namespace CMS;
 
+use Nette\Environment;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Events;
@@ -17,120 +18,94 @@ use Doctrine\Common\EventManager;
  */
 class DoctrineLoader extends \Nette\Object
 {
-    private $entityManager;
-    private $connectionOptions;
-    private $entityDir;
-    private $proxyDir;
-    private $prefix;
+	private $entityManager;
+	private $connectionOptions;
+	private $entityDir;
+	private $proxyDir;
 
-    public function __construct($options)
-    {
-        if(isset($options['connection'])) {
-            $this->setConnectionOptions($options['connection']);
-        }
-        if(isset($options['entityDir'])) {
-            $this->setEntityDir($options['entityDir']);
-        }
-        if(isset($options['proxyDir'])) {
-            $this->setProxyDir($options['proxyDir']);
-        }
-        if(isset($options['prefix'])) {
-            $this->setPrefix($options['prefix']);
-        }
-    }
 
-    /** @return DoctrineLoader */
-    public static function createDoctrineLoader($options)
-    {
-        return new DoctrineLoader($options);
-    }
 
-    /** @return array */
-    public function getConnectionOptions()
-    {
-        return $this->connectionOptions;
-    }
+	public function __construct()
+	{
+		$database = Environment::getConfig('database');
 
-    public function setConnectionOptions($connectionOptions)
-    {
-        $this->connectionOptions = (array) $connectionOptions;
-    }
+		$this->connectionOptions = array(
+			'driver'   => $database->driver,
+			'dbname'   => $database->name,
+			'user'     => $database->username,
+			'password' => $database->password,
+		);
 
-    /** @return string */
-    public function getEntityDir()
-    {
-        return $this->entityDir;
-    }
+		$doctrine = Environment::getConfig('doctrine');
 
-    public function setEntityDir($entityDir)
-    {
-        $this->entityDir = (string) $entityDir;
-    }
+		$this->entityDir = $doctrine->entityDir;
+		$this->proxyDir = $doctrine->proxyDir;
+	}
 
-    /** @return string */
-    public function getProxyDir()
-    {
-        return $this->proxyDir;
-    }
+	
+	/** @return EntityManager */
+	public function getEntityManager()
+	{
+		if($this->entityManager == null) {
+			$config = $this->createConfiguration();
+			$connectionOptions = $this->getConnectionOptions();
 
-    public function setProxyDir($proxyDir)
-    {
-        $this->proxyDir = (string) $proxyDir;
-    }
+			$eventManager = new Doctrine\Common\EventManager();
+			if($connectionOptions['driver'] == 'pdo_mysql') {
+				$eventManager->addEventSubscriber(new \Doctrine\DBAL\Event\Listeners\MysqlSessionInit('utf8', 'utf8_czech_ci'));
+			}
 
-    /** @return string */
-    public function getPrefix()
-    {
-        return $this->prefix;
-    }
+			$this->entityManager = EntityManager::create($connectionOptions, $config, $eventManager);
+		}
 
-    public function setPrefix($prefix)
-    {
-        $this->prefix = (string) $prefix;
-    }
+		return $this->entityManager;
+	}
 
-    /** @return EntityManager */
-    public function getEntityManager()
-    {
-        if($this->entityManager == null) {
-            $config = $this->createConfiguration();
-            $options = $this->getConnectionOptions();
-            $this->entityManager = EntityManager::create($options, $config);
-        }
-        return $this->entityManager;
-    }
 
-    public function setEntityManager(EntityManager $entityManager)
-    {
-        $this->entityManager = $entityManager;
-    }
 
-    /** @return Configuration */
-    public function createConfiguration()
-    {
-        $config = new Configuration;
+	public function setEntityManager(EntityManager $entityManager)
+	{
+		$this->entityManager = $entityManager;
+	}
 
-        // set caching
-        $cache = new XcacheCache;
-        $config->setMetadataCacheImpl($cache);
-        $config->setQueryCacheImpl($cache);
 
-        // set metadata driver
-        $driverImpl = $config->newDefaultAnnotationDriver($this->getEntityDir());
-        $config->setMetadataDriverImpl($driverImpl);
 
-        // set proxies
-        $config->setProxyDir($this->getProxyDir());
-        $config->setProxyNamespace('\CMS\Entity\Proxy');
-        $config->setAutoGenerateProxyClasses(true);
+	public function registerEntityManager()
+	{
+		Environment::getServiceLocator()->addService('Doctrine\ORM\EntityManager', $this->entityManager);
+		Environment::setServiceAlias('Doctrine\\ORM\\EntityManager', 'EntityManager');
+	}
 
-        return $config;
-    }
 
-    public function loadClassMetadata(LoadClassMetadataEventArgs $eventArgs)
-    {
-        $classMetadata = $eventArgs->getClassMetadata();
-        $classMetadata->setTableName($this->getPrefix() . $classMetadata->getTableName());
-    }
+
+	/** @return Configuration */
+	private function createConfiguration()
+	{
+		$config = new Configuration;
+
+		// set caching
+		$cache = new XcacheCache;
+		$config->setMetadataCacheImpl($cache);
+		$config->setQueryCacheImpl($cache);
+
+		// set metadata driver
+		$driverImpl = $config->newDefaultAnnotationDriver($this->getEntityDir());
+		$config->setMetadataDriverImpl($driverImpl);
+
+		// set proxies
+		$config->setProxyDir($this->getProxyDir());
+		$config->setProxyNamespace('\CMS\Entity\Proxy');
+		$config->setAutoGenerateProxyClasses(true);
+
+		return $config;
+	}
+
+
+
+	private function loadClassMetadata(LoadClassMetadataEventArgs $eventArgs)
+	{
+		$classMetadata = $eventArgs->getClassMetadata();
+		$classMetadata->setTableName($this->getPrefix() . $classMetadata->getTableName());
+	}
 
 }

@@ -2,7 +2,6 @@
 
 namespace CMS\Common;
 
-use strtoupper;
 use Nette\Environment;
 use Nette\Caching\ICacheStorage;
 use Doctrine\ORM\EntityManager;
@@ -53,7 +52,7 @@ abstract class BaseDao implements IBaseDao
     
 
 
-    public function setEntityName(string $entityName)
+    public function setEntityName($entityName)
     {
         $this->entityName = $entityName;
 
@@ -126,7 +125,7 @@ abstract class BaseDao implements IBaseDao
 
 
     /** @return array */
-    public function listResults(IFilter $filter = null, IOrderRule $order = null, IPaginator $paginator = null)
+    public function listResults($filters, IPaginator $paginator = null)
     {
         if($paginator !== null) {
             // find total results

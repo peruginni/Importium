@@ -2,10 +2,8 @@
 
 namespace CMS\Utilities;
 
-use CMS\InvalidArgumentException;
-use in_array;
-use implode;
-use strtoupper;
+use Doctrine\ORM\Query\Expr;
+
 
 /**
  * Filter
@@ -15,69 +13,55 @@ use strtoupper;
  */
 class Filter implements IFilter
 {
-    protected $property;
-    protected $value;
-    protected $conjuction;
-    protected $nextFilter;
-    
-    public function __construct($property, $value, $conjuction = self::CONJUCTION_NONE)
-    {
-        $this->property = $property;
-        $this->value = $value;
-        $this->conjuction = $value;
-    }
+	/** @var object */
+	protected $expression = null;
 
-    /** @return string */
-    public function getProperty()
-    {
-        return $this->property;
-    }
+	/** @var array */
+	protected $parameters = array();
 
-    public function setProperty($property)
-    {
-        $this->property = $property;
-    }
 
-    /** @return mixed */
-    public function getValue()
-    {
-        return $this->value;
-    }
 
-    public function setValue($value)
-    {
-        $this->value= $value;
-    }
+	public function __construct($expression, $parameters)
+	{
+		$this->expression = $expression;
 
-    /** @return string */
-    public function getConjuction()
-    {
-        return $this->conjuction;
-    }
+		if(is_array($parameters)) {
+			$this->parameters = $parameters;
+		} else {
+			$this->parameters = array(1 => $parameters);
+		}
+	}
 
-    public function setConjuction($conjuction)
-    {
-        $conjunction = strtoupper($conjuction);
-        $allowedConjuctions = array(
-            self::CONJUCTION_NONE,
-            self::CONJUCTION_AND,
-            self::CONJUCTION_OR
-        );
-        if(!in_array($conjuction, $allowedConjuctions)) {
-            throw new InvalidArgumentException('Allowed conjuctions are '.implode(',',$allowedConjuctions));
-        }
-        $this->conjuction= $conjuction;
-    }
+	/** @return object */
+	public function getExpression()
+	{
+		return $this->expression;
+	}
 
-    /** @return IFilter */
-    public function getNextFilter()
-    {
-        return $this->nextFilter;
-    }
+	public function setExpression($expression)
+	{
+		$this->expression= $expression;
+	}
 
-    public function setNextFilter(IFilter $nextFilter)
-    {
-        $this->nextFilter = $nextFilter;
-    }
+	/** @return array */
+	public function getParameters()
+	{
+		return $this->parameters;
+	}
+
+	public function setParameters(array $parameters)
+	{
+		$this->parameters= $parameters;
+	}
+
+	public function addParameter($index, $value)
+	{
+		$this->parameters[$index] = $value;
+	}
+
+	public function removeParameter($index)
+	{
+		unset($this->parameters[$index]);
+	}
 
 }

@@ -10,13 +10,13 @@ namespace CMS\Utilities;
  */
 interface IPaginator
 {
-    public function getCurrentPage();
-    public function setCurrentPage($currentPage);
-    public function getResultsPerPage();
-    public function setResultsPerPage($resultsPerPage);
-    public function getTotalResults();
-    public function setTotalResults($totalResults);
-    public function hasPrevious();
-    public function hasNext();
+	public function getCurrentPage();
+	public function setCurrentPage($currentPage);
+	public function getResultsPerPage();
+	public function setResultsPerPage($resultsPerPage);
+	public function getTotalResults();
+	public function setTotalResults($totalResults);
+	public function hasPrevious();
+	public function hasNext();
 }
 

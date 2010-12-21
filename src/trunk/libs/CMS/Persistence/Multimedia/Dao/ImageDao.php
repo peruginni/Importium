@@ -30,6 +30,7 @@ class ImageDao extends BaseDao implements IImageDao
     public function listImagesByAlbum(Album $album, IOrderRule $order = null, IPaginator $paginator = null)
     {
         $album = new Filter('album', $album);
+        $name = new Filter('name')
         if($order === null) {
             $order = new AscendingOrder('order');
         }

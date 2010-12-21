@@ -15,77 +15,84 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Configuration;
 
 
+
 /**
- * Step 1: Load Nette Framework
+ * Load Nette Framework
  */
+
 require LIBS_DIR . '/Nette/loader.php';
 
-/**
- * Step 2: Configure environment
- * 2a) enable Nette\Debug for better exception and error visualisation
- */
-Debug::enable();
+
 
 /**
- * 2b) load configuration from config.ini file
+ * Configure environment
  */
+
 Environment::loadConfig();
+Environment::setMode(Environment::DEVELOPMENT);
+
+$doctrineLoader = new CMS\DoctrineLoader();
+$doctrineLoader->registerEntityManager();
+
+if(!Environment::isProduction()) {
+	Debug::enable();
+
+	$dataInitializator = new DataInitializator(
+		DataInitializator::DROP_AND_CREATE
+	);
+	$dataInitializator->run();
+}
+
 
 /**
- * Step 3: Configure application
- * 3a) get and setup a front controller
+ * Configure application
  */
+
+// get and setup a front controller
 $application = Environment::getApplication();
 $application->errorPresenter = 'Error';
 $application->catchExceptions = false;
 
-/**
- * 3b) initialize data
- */
-$dataInitializator = new DataInitializator();
-$dataInitializator->setGenerationStrategy(
-    DataInitializator::DROP_AND_CREATE
-);
-$dataInitializator->run();
+
 
 /**
- * Step 4: Setup application router
+ * Setup application router
  */
+
 $router = $application->getRouter();
 
 if (function_exists('apache_get_modules') && in_array('mod_rewrite', apache_get_modules())) {
-    # AdminModule routes
-    $router[] = new Route('admin/<presenter>/<action>/<id>', array(
-        'module'    => 'Admin',
-        'presenter' => 'Default',
-        'action'    => 'default',
-        'id'        => null
-    ));
+	
+	$router[] = new Route('admin/<presenter>/<action>/<id>', array(
+		'module'    => 'Admin',
+		'presenter' => 'Default',
+		'action'    => 'default',
+		'id'        => null
+	));
 
-    $router[] = new Route('index.php', array(
-		'module' => 'Front',
+	$router[] = new Route('index.php', array(
+		'module'    => 'Front',
 		'presenter' => 'Default',
 	), Route::ONE_WAY);
 
 	$router[] = new Route('<presenter>/<action>/<id>', array(
 		'module'    => 'Front',
-        'presenter' => 'Default',
-		'action' => 'default',
-		'id' => NULL,
+		'presenter' => 'Default',
+		'action'    => 'default',
+		'id'        => NULL,
 	));
 
-// add translation tables
-//    Route::setStyleProperty('presenter', Route::FILTER_TABLE, array(
-//            'produkt' => 'Product',
-//            'kosik' => 'Basket',
-//            'zakaznik' => 'Customer',
-//    ));
 } else {
+	
 	$router[] = new SimpleRouter('Front:Default:default');
+
 }
 
+
+
 /**
- * Step 5: Run the application!
+ * Run the application
  */
+
 $application->run();
 
