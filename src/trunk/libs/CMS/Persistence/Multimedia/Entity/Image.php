@@ -39,7 +39,7 @@ class Image
     /** @Column(type="datetime") */
     private $dateCreated;
     
-    /** @Column(type="integer") */
+    /** @Column(type="integer") order relative to other images within the album */
     private $order;
 
     public function __construct()

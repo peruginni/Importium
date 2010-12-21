@@ -14,44 +14,18 @@ use BadMethodCallException;
  */
 abstract class BaseBusiness implements IBaseBusiness
 {
-    /** @var string */
-    protected $daoType;
-
-    /** @var IBaseDao */
-    protected $dao;
-
     /** @var ICacheStorage */
     protected $cache;
 
     public function __construct()
     {
-        $this->getDao();
         $this->getCache();
     }
-
-    /** @return string */
-    public function getDaoType()
-    {
-        return $this->daoType;
-    }
-
-    public function setDaoType($daoType)
-    {
-        $this->daoType = (string) $daoType;
-    }
-
+    
     /** @return IBaseDao */
-    public function getDao()
+    public function getDao($daoServiceIdentifier)
     {
-        if($this->dao == null) {
-            $this->dao = Environment::getService($this->daoType);
-        }
-        return $this->dao;
-    }
-
-    public function setDao(IBaseDao $dao)
-    {
-        $this->dao = $dao;
+        return Environment::getService($this->daoType);
     }
 
     /** @return ICacheStorage */
@@ -66,35 +40,6 @@ abstract class BaseBusiness implements IBaseBusiness
     public function setCache(ICacheStorage $cache)
     {
         $this->cache = $cache;
-    }
-
-    public function persist($entity)
-    {
-        $this->dao->persist($entity);
-    }
-
-    public function remove($entity)
-    {
-        $this->dao->remove($entity);
-    }
-
-    public function findAll()
-    {
-        return $this->dao->findAll();
-    }
-
-    public function findById($id)
-    {
-        return $this->dao->findById($id);
-    }
-
-    public function __call($method, $arguments)
-    {
-        if(method_exists($this->dao, $method)) {
-            call_user_method($method, $this->dao, $arguments);
-        } else {
-            throw new BadMethodCallException();
-        }
     }
 }
 

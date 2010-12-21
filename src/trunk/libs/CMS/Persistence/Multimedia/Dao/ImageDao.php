@@ -4,6 +4,8 @@ namespace CMS\Multimedia;
 
 use CMS\Common\BaseDao;
 
+
+
 /**
  * ImageDao
  *
@@ -12,23 +14,34 @@ use CMS\Common\BaseDao;
  */
 class ImageDao extends BaseDao implements IImageDao
 {
+    /** @var string */
     protected $entityName = 'CMS\Multimedia\Image';
 
-    protected $orderByColumns = array(
-        IImageDao::DATE_CREATED,
-        IImageDao::ORDER
-    );
 
-    /** @return \Doctrine\ORM\Query */
-    public function findAll(array $orderBy = array(), $includeThumbnails = false)
+
+    /** Core methods *******************************************************/
+
+
+
+    /**
+     * Returns images placed under given album
+     * @return ArrayCollection
+     */
+    public function listImagesByAlbum(Album $album, IOrderRule $order = null, IPaginator $paginator = null)
     {
-        $qb = $this->em->createQueryBuilder();
-        $qb->select('u')->from($this->entityName, 'u');
-        $this->configureOrderBy($qb, $orderBy);
-        if($includeThumbnails == false) {
-            $qb->where('u.sourceImage IS NULL');
+        $album = new Filter('album', $album);
+        if($order === null) {
+            $order = new AscendingOrder('order');
         }
-        return $qb->getQuery();
+
+        $allowedProperties = array('title', 'dateCreated', 'order');
+        if(in_array($order->getProperty(), $allowedProperties)) {
+            return $this->listResults($filter, $order, $paginator);
+        } else {
+            throw new InvalidArgumentException(
+                'Sorting is allowed only on properties '.implode(',', $allowedProperties));
+        }
     }
+
 }
 

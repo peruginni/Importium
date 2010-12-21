@@ -3,7 +3,10 @@
 namespace CMS\Multimedia;
 
 use CMS\Common\BaseDao;
-use Doctrine\ORM\QueryBuilder;
+use CMS\Utilities\Filter;
+use CMS\Utilities\AscendingOrder;
+
+
 
 /**
  * FileDao
@@ -13,29 +16,34 @@ use Doctrine\ORM\QueryBuilder;
  */
 class FileDao extends BaseDao implements IFileDao
 {
+    /** @var string */
     protected $entityName = 'CMS\Multimedia\File';
 
-    protected $orderByColumns = array(
-        IFileDao::DATE_CREATED,
-        IFileDao::TITLE
-    );
 
-    /** @return \Doctrine\ORM\Query */
-    public function findByFolder(Folder $folder, array $orderBy = array())
+
+    /** Core methods *******************************************************/
+
+
+
+    /**
+     * Returns files placed under given folder
+     * @return ArrayCollection
+     */
+    public function listFilesByFolder(Folder $folder, IOrderRule $order = null, IPaginator $paginator = null)
     {
-        $qb = $this->em->createQueryBuilder();
-        $qb->select('u');
-        $qb->from($this->entityName, 'u');
-        $qb->where('u.folder = ?1');
-        $qb->setParameter(1, $folder);
-        $this->configureOrderBy($qb, $orderBy);
-        return $qb->getQuery();
+        $filter = new Filter('folder', $folder);
+        if($order === null) {
+            $order = new AscendingOrder('title');
+        }
+
+        $allowedProperties = array('title', 'dateCreated');
+        if(in_array($order->getProperty(), $allowedProperties)) {
+            return $this->listResults($filter, $order, $paginator);
+        } else {
+            throw new InvalidArgumentException(
+                'Sorting is allowed only on properties '.implode(',', $allowedProperties));
+        }
     }
 
-    /** @return ArrayCollection */
-    public function findByTitle($title)
-    {
-        return $this->em->getRepository($this->entityName)->findByTitle($title);
-    }
 }
 

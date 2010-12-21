@@ -2,8 +2,17 @@
 
 namespace CMS\Common;
 
+use strtoupper;
 use Nette\Environment;
+use Nette\Caching\ICacheStorage;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\QueryBuilder;
+use CMS\Utilities\IPaginator;
+use CMS\Utilities\IFilter;
+use CMS\Utilities\IOrderRule;
+use CMS\Utilities\IPaginator;
+
+
 
 /**
  * BaseDao
@@ -22,8 +31,7 @@ abstract class BaseDao implements IBaseDao
     /** @var ICacheStorage */
     protected $cache;
 
-    /** @var array */
-    protected $orderByColumns;
+
 
     public function __construct()
     {
@@ -31,16 +39,27 @@ abstract class BaseDao implements IBaseDao
         $this->getCache();
     }
 
+
+
+    /** Getters and setters *************************************************/
+
+
+    
     /** @return string */
     public function getEntityName()
     {
         return $this->entityName;
     }
+    
+
 
     public function setEntityName(string $entityName)
     {
         $this->entityName = $entityName;
+
     }
+
+
 
     /** @return EntityManager */
     public function getEntityManager()
@@ -52,10 +71,14 @@ abstract class BaseDao implements IBaseDao
         return $this->em;
     }
 
+
+
     public function setEntityManager(EntityManager $em)
     {
         $this->em = $em;
     }
+
+
 
     /** @return ICacheStorage */
     public function getCache()
@@ -66,21 +89,18 @@ abstract class BaseDao implements IBaseDao
         return $this->cache;
     }
 
+
+
     public function setCache(ICacheStorage $cache)
     {
         $this->cache = $cache;
     }
 
-    /** @return array */
-    public function getOrderByColumns()
-    {
-        return $this->orderByColumns;
-    }
 
-    public function setOrderByColumns(array $orderByColumns)
-    {
-        $this->orderByColumns = $orderByColumns;
-    }
+
+    /** Core methods *******************************************************/
+
+
 
     public function persist($entity)
     {
@@ -88,36 +108,102 @@ abstract class BaseDao implements IBaseDao
         $this->em->flush();
     }
 
+
+
     public function remove($entity)
     {
         $this->em->remove($entity);
         $this->em->flush();
     }
 
-    /** @return \Doctrine\ORM\Query */
-    public function findAll(array $orderBy = array())
-    {
-        $qb = $this->em->createQueryBuilder();
-        $qb->select('u')->from($this->entityName, 'u');
-        $this->configureOrderBy($qb, $orderBy);
-        return $qb->getQuery();
-    }
+
 
     public function findById($id)
     {
-        return $this->em->getRepository($this->entityName)->find($id);
+        return $this->em->getRepository($this->getEntityName())->find($id);
     }
-    
-    protected function configureOrderBy(QueryBuilder &$qb, array $orderBy)
+
+
+
+    /** @return array */
+    public function listResults(IFilter $filter = null, IOrderRule $order = null, IPaginator $paginator = null)
     {
-        $columns = $this->getOrderByColumns();
-        $orders = array(self::ASC, self::DESC);
-        foreach($orderBy as $column => $order) {
-            if(!in_array($column, $columns) && !in_array($order, $orders)) {
-                throw new InvalidArgumentException();
+        if($paginator !== null) {
+            // find total results
+            $qb = $this->createListQuery(true);
+            $this->applyFilterToQuery($qb, $filter);
+            $this->applyOrderToQuery($qb, $order);
+            $totalResults = $qb->getQuery()->getSingleScalarResult();
+            $paginator->setTotalResults($totalResults);
+        }
+
+        // find entites
+        $qb = $this->createListQuery(false);
+        $this->applyFilterToQuery($qb, $filter);
+        $this->applyOrderToQuery($qb, $order);
+        $query = $qb->getQuery();
+        if($paginator !== null) {
+            $page = $paginator->getCurrentPage() - 1;
+            $perPage = $paginator->getResultsPerPage();
+            $query->setFirstResult($page*$perPage);
+            $query->setMaxResults($perPage);
+        }
+        return $query->getResult();
+    }
+
+
+
+    /** Helpers *************************************************************/
+
+
+
+    protected function applyFilterToQuery(QueryBuilder $qb, IFilter $filter)
+    {
+        while($filter !== null) {
+            $property = $filter->getProperty();
+            switch($filter->getConjuction()) {
+                case IFilter::CONJUCTION_NONE:
+                    $qb->where('e.'.$property.' = :'.$property);
+                    break;
+                case IFilter::CONJUCTION_AND:
+                    $qb->andWhere('e.'.$property.' = :'.$property);
+                    break;
+                case IFilter::CONJUCTION_OR:
+                    $qb->orWhere('e.'.$property.' = :'.$property);
+                    break;
+                default:
+                    throw new InvalidArgumentException('Invalid filter conjuction');
             }
-            $qb->orderBy($column, $order);
+            $qb->setParameter(':'.$property, $filter->getValue());
+            $filter = $filter->getNextFilter();
         }
     }
+
+
+
+    protected function applyOrderToQuery(QueryBuilder $qb, IOrderRule $order)
+    {
+        while($order !== null) {
+            $qb->orderBy($order->getProperty(), $order->getOrdering());
+            $order = $order->getNextRule();
+        }
+    }
+
+
+
+    /** @return QueryBuilder */
+    protected function createListQuery($onlyCount)
+    {
+        $qb = $this->em->createQueryBuilder();
+
+        if($onlyCount)
+            $qb->select('COUNT(e.id)');
+        else
+            $qb->select('e');
+
+        $qb->from($this->getEntityName(), 'e');
+        return $qb;
+    }
+
 }
 

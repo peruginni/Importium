@@ -3,6 +3,12 @@
 namespace CMS\Multimedia;
 
 use CMS\Common\BaseDao;
+use CMS\Utilities\IPaginator;
+use CMS\Utilities\IOrderRule;
+use CMS\Utilities\AscendingOrder;
+use CMS\Utilities\DescendingOrder;
+use in_array;
+use implode;
 
 /**
  * FolderDao
@@ -12,11 +18,33 @@ use CMS\Common\BaseDao;
  */
 class FolderDao extends BaseDao implements IFolderDao
 {
+    /** @var string */
     protected $entityName = 'CMS\Multimedia\Folder';
 
-    protected $orderByColumns = array(
-        IFileDao::DATE_CREATED,
-        IFileDao::TITLE
-    );
+
+
+    /** Core methods *******************************************************/
+
+
+
+    /**
+     * Returns list of folders
+     * @return ArrayCollection
+     */
+    public function listFolders(IOrderRule $order = null, IPaginator $paginator = null)
+    {
+        if($order === null) {
+            $order = new AscendingOrder('title');
+        }
+
+        $allowedProperties = array('title', 'dateCreated');
+        if(in_array($order->getProperty(), $allowedProperties)) {
+            return $this->listResults(null, $order, $paginator);
+        } else {
+            throw new InvalidArgumentException(
+                'Sorting is allowed only on properties '.implode(',', $allowedProperties));
+        }
+    }
+    
 }
 
