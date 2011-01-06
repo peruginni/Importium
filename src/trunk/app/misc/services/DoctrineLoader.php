@@ -1,7 +1,6 @@
 <?php
 
-namespace CMS;
-
+use Nette\Environment;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Events;
@@ -17,120 +16,136 @@ use Doctrine\Common\EventManager;
  */
 class DoctrineLoader extends \Nette\Object
 {
-    private $entityManager;
-    private $connectionOptions;
-    private $entityDir;
-    private $proxyDir;
-    private $prefix;
+	private $entityManager;
+	private $connectionOptions;
+	private $entityDir;
+	private $proxyDir;
+	private $proxyNamespace;
 
-    public function __construct($options)
-    {
-        if(isset($options['connection'])) {
-            $this->setConnectionOptions($options['connection']);
-        }
-        if(isset($options['entityDir'])) {
-            $this->setEntityDir($options['entityDir']);
-        }
-        if(isset($options['proxyDir'])) {
-            $this->setProxyDir($options['proxyDir']);
-        }
-        if(isset($options['prefix'])) {
-            $this->setPrefix($options['prefix']);
-        }
-    }
 
-    /** @return DoctrineLoader */
-    public static function createDoctrineLoader($options)
-    {
-        return new DoctrineLoader($options);
-    }
 
-    /** @return array */
-    public function getConnectionOptions()
-    {
-        return $this->connectionOptions;
-    }
+	public function __construct()
+	{
+		$this->setup();
+	}
 
-    public function setConnectionOptions($connectionOptions)
-    {
-        $this->connectionOptions = (array) $connectionOptions;
-    }
 
-    /** @return string */
-    public function getEntityDir()
-    {
-        return $this->entityDir;
-    }
+	/**
+	 * Read configuration from nette enviroment settings and setup
+	 * all necessary class properties.
+	 */
+	public function setup()
+	{
+		$database = Environment::getConfig('database');
 
-    public function setEntityDir($entityDir)
-    {
-        $this->entityDir = (string) $entityDir;
-    }
+		$this->connectionOptions = array(
+			'driver'   => $database->driver,
+			'dbname'   => $database->name,
+			'user'     => $database->username,
+			'password' => $database->password,
+		);
 
-    /** @return string */
-    public function getProxyDir()
-    {
-        return $this->proxyDir;
-    }
+		$doctrine = Environment::getConfig('doctrine');
 
-    public function setProxyDir($proxyDir)
-    {
-        $this->proxyDir = (string) $proxyDir;
-    }
+		$this->entityDir = $doctrine->entityDir;
+		$this->proxyDir = $doctrine->proxyDir;
+		$this->proxyNamespace = $doctrine->proxyNamespace;
 
-    /** @return string */
-    public function getPrefix()
-    {
-        return $this->prefix;
-    }
+	}
 
-    public function setPrefix($prefix)
-    {
-        $this->prefix = (string) $prefix;
-    }
 
-    /** @return EntityManager */
-    public function getEntityManager()
-    {
-        if($this->entityManager == null) {
-            $config = $this->createConfiguration();
-            $options = $this->getConnectionOptions();
-            $this->entityManager = EntityManager::create($options, $config);
-        }
-        return $this->entityManager;
-    }
+	
+	/**
+	 * Returns entity manager. In case EM does not exists, will create new instance of EM.
+	 * 
+	 * @return EntityManager
+	 */
+	public function getEntityManager()
+	{
+		if($this->entityManager == null) {
+			$config = $this->createConfiguration();
+			$eventManager = new Doctrine\Common\EventManager();
+			if($this->connectionOptions['driver'] == 'pdo_mysql') {
+				$eventManager->addEventSubscriber(
+					new \Doctrine\DBAL\Event\Listeners\MysqlSessionInit
+					('utf8', 'utf8_czech_ci')
+				);
+			}
 
-    public function setEntityManager(EntityManager $entityManager)
-    {
-        $this->entityManager = $entityManager;
-    }
+			$this->entityManager = EntityManager::create($this->connectionOptions, $config, $eventManager);
+		}
 
-    /** @return Configuration */
-    public function createConfiguration()
-    {
-        $config = new Configuration;
+		return $this->entityManager;
+	}
 
-        // set caching
-        $cache = new XcacheCache;
-        $config->setMetadataCacheImpl($cache);
-        $config->setQueryCacheImpl($cache);
 
-        // set metadata driver
-        $driverImpl = $config->newDefaultAnnotationDriver($this->getEntityDir());
-        $config->setMetadataDriverImpl($driverImpl);
+	/**
+	 * Set entity manager
+	 */
+	public function setEntityManager(EntityManager $entityManager)
+	{
+		$this->entityManager = $entityManager;
+	}
 
-        // set proxies
-        $config->setProxyDir($this->getProxyDir());
-        $config->setProxyNamespace('\CMS\Entity\Proxy');
-        $config->setAutoGenerateProxyClasses(true);
 
-        return $config;
-    }
 
-    public function loadClassMetadata(LoadClassMetadataEventArgs $eventArgs)
-    {
-        $classMetadata = $eventArgs->getClassMetadata();
-        $classMetadata->setTableName($this->getPrefix() . $classMetadata->getTableName());
-    }
+	/**
+	 * Create new instance of entity manager
+	 */
+	public function restartEntityManager()
+	{
+		$this->entityManager = null;
+		$this->getEntityManager();
+	}
+
+
+
+	/**
+	 * Register entity manager into nette service manager
+	 */
+	public function registerEntityManager()
+	{
+		Environment::getServiceLocator()->addService('Doctrine\ORM\EntityManager', $this->getEntityManager());
+		Environment::setServiceAlias('Doctrine\\ORM\\EntityManager', 'EntityManager');
+	}
+
+	
+
+
+	/**
+	 * ******************************************************************
+	 * 
+	 *   Helpers
+	 * 
+	 * ******************************************************************
+	 */
+
+
+
+	/**
+	 * Create configuration used for creating new instance of doctrine's entity manager
+	 *
+	 * @return Configuration
+	 */
+	private function createConfiguration()
+	{
+		$config = new Configuration;
+
+		// set caching
+		$cache = new XcacheCache;
+		$config->setMetadataCacheImpl($cache);
+		$config->setQueryCacheImpl($cache);
+
+		// set metadata driver
+		$driverImpl = $config->newDefaultAnnotationDriver($this->entityDir);
+		$config->setMetadataDriverImpl($driverImpl);
+
+		// set proxies
+		$config->setProxyDir($this->proxyDir);
+		$config->setProxyNamespace($this->proxyNamespace);
+		$config->setAutoGenerateProxyClasses(true);
+
+		return $config;
+	}
 
 }

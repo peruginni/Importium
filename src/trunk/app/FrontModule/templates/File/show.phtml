@@ -1,0 +1,22 @@
+{block #epicenter}
+
+<h1>File details</h1>
+
+
+{if $file}
+
+	<p>
+		<b>Title: </b> {$file->getTitle()}
+		<br>
+		<b>Date created: </b> {$file->getDateCreated()|date}
+	</p>
+
+	<a href="{$fileStoragePath}/{$file->getFilename()}.{$file->getExtension()}">Download</a>
+
+{else}
+	
+	<p>No file</p>
+	
+{/if}
+
+

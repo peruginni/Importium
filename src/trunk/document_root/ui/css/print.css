@@ -1,0 +1,19 @@
+/**
+ * Print layout
+ *
+ * @author      Ondrej Macoszek <ondra.macoszek@gmail.com>
+ * @copyright   (c) 2010, Ondrej Macoszek
+ */
+
+html { font-family: Constantia, Palatino, 'palatino linotype', serif; }
+
+nav { display: none; }
+#body nav.submenu { display: none; }
+
+#footer .backend { display: none; }
+
+#body a:link:after, #body a:visited:after,
+#footer a:link:after, #footer a:visited:after
+{ content: " (" attr(href) ") "; font-size: 90%; }
+
+.pagination { display: none; }

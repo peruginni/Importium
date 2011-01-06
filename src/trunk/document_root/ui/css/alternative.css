@@ -1,0 +1,7 @@
+@import url('main.css');
+
+@media screen, projection {
+
+html { background-image: url('../img/page.bg3.png'); }
+
+} /* /@media screen, projection */

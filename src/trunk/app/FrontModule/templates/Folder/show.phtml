@@ -1,0 +1,36 @@
+{block #epicenter}
+
+<h1>Files under {$folder->getTitle()}</h1>
+
+
+{if count($files) > 0}
+
+	<table class="basic">
+		<caption>Files under {$folder->getTitle()}</caption>
+		<thead>
+			<tr>
+				<th>Title</th>
+				<th>Date Created</th>
+				<th>Actions</th>
+			</tr>
+		</thead>
+		<tbody>
+
+		{foreach $files as $file}
+		<tr>
+			<td>{$file->getTitle()}</td>
+			<td>{$file->getDateCreated()|date}</td>
+			<td><a href="{plink File:show, id => $file->getId()}">Details</a></td>
+		</tr>
+		{/foreach}
+
+		</tbody>
+	</table>
+
+{else}
+	
+	<p>No files under {$folder->getTitle()}.</p>
+	
+{/if}
+
+

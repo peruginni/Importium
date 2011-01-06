@@ -11,10 +11,9 @@ use Nette\Debug;
 use Nette\Environment;
 use Nette\Application\Route;
 use Nette\Application\SimpleRouter;
+use Nette\Caching\FileStorage;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Configuration;
-
-
 
 /**
  * Load Nette Framework
@@ -22,7 +21,7 @@ use Doctrine\ORM\Configuration;
 
 require LIBS_DIR . '/Nette/loader.php';
 
-
+//Debug::enable();
 
 /**
  * Configure environment
@@ -31,18 +30,22 @@ require LIBS_DIR . '/Nette/loader.php';
 Environment::loadConfig();
 Environment::setMode(Environment::DEVELOPMENT);
 
-$doctrineLoader = new CMS\DoctrineLoader();
+// caching
+$fileStorage = new FileStorage(Environment::getVariable('cacheDir'));
+Environment::getServiceLocator()->removeService('Nette\Caching\ICacheStorage');
+Environment::getServiceLocator()->addService('Nette\Caching\ICacheStorage', $fileStorage);
+	
+// doctrine
+$doctrineLoader = new DoctrineLoader();
 $doctrineLoader->registerEntityManager();
 
 if(!Environment::isProduction()) {
-	Debug::enable();
-
 	$dataInitializator = new DataInitializator(
 		DataInitializator::DROP_AND_CREATE
 	);
-	$dataInitializator->run();
+	$dataInitializator->setEntityManager(Environment::getService('Doctrine\ORM\EntityManager'));
+	//$dataInitializator->run();
 }
-
 
 /**
  * Configure application
@@ -63,9 +66,9 @@ $router = $application->getRouter();
 
 if (function_exists('apache_get_modules') && in_array('mod_rewrite', apache_get_modules())) {
 	
-	$router[] = new Route('admin/<presenter>/<action>/<id>', array(
+	$router[] = new Route('admin/<presenter>/<action>/<id> ? <page> ', array(
 		'module'    => 'Admin',
-		'presenter' => 'Default',
+		'presenter' => 'User',
 		'action'    => 'default',
 		'id'        => null
 	));
@@ -75,7 +78,7 @@ if (function_exists('apache_get_modules') && in_array('mod_rewrite', apache_get_
 		'presenter' => 'Default',
 	), Route::ONE_WAY);
 
-	$router[] = new Route('<presenter>/<action>/<id>', array(
+	$router[] = new Route('<presenter>/<action>/<id> ? <page> ', array(
 		'module'    => 'Front',
 		'presenter' => 'Default',
 		'action'    => 'default',
@@ -87,6 +90,8 @@ if (function_exists('apache_get_modules') && in_array('mod_rewrite', apache_get_
 	$router[] = new SimpleRouter('Front:Default:default');
 
 }
+
+
 
 
 

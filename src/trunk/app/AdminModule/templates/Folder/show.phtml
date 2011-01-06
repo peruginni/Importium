@@ -1,0 +1,40 @@
+{block #epicenter}
+
+<h1>Content of folder {$folder->getTitle()}</h1>
+
+<a href="{plink Folder:list}">Show all folders</a>
+
+{if count($files) > 0}
+
+	<table class="basic">
+		<caption>Files under {$folder->getTitle()}</caption>
+		<thead>
+			<tr>
+				<th>Title</th>
+				<th>Date Created</th>
+				<th>Actions</th>
+			</tr>
+		</thead>
+		<tbody>
+
+		{foreach $files as $file}
+		<tr>
+			<td>{$file->getTitle()}</td>
+			<td>{$file->getDateCreated()|date}</td>
+			<td>
+				<a href="{plink File:edit, id => $file->getId()}">Edit</a>
+				| <a href="{plink File:remove, id => $file->getId()}" class="confirmRemove">Remove</a>
+			</td>
+		</tr>
+		{/foreach}
+
+		</tbody>
+	</table>
+
+{else}
+	
+	<p>No files under {$folder->getTitle()}.</p>
+	
+{/if}
+
+

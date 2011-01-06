@@ -1,0 +1,41 @@
+{block #epicenter}
+
+
+<h1>Files</h1>
+
+<a href="{plink add}">Add new file</a>
+
+{if count($files) > 0}
+
+	<table class="basic">
+		<caption>Files</caption>
+		<thead>
+			<tr>
+				<th>Title</th>
+				<th>Date Created</th>
+				<th>Actions</th>
+			</tr>
+		</thead>
+		<tbody>
+
+		{foreach $files as $file}
+		<tr>
+			<td>{$file->getTitle()}</td>
+			<td>{$file->getDateCreated()}</td>
+			<td>
+				<a href="{plink edit, id => $file->getId()}">Edit</a>
+				| <a href="{plink remove, id => $file->getId()}" class="confirmRemove">Remove</a>
+			</td>
+		</tr>
+		{/foreach}
+
+		</tbody>
+	</table>
+
+{else}
+	
+	<p>No files.</p>
+	
+{/if}
+
+

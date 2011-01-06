@@ -1,0 +1,98 @@
+/**
+ * Typography theme
+ *
+ * @author      Ondrej Macoszek <ondra.macoszek@gmail.com>
+ * @copyright   (c) 2010, Ondrej Macoszek
+ */
+
+/* common */
+body { font-size: 14px; font-family: Arial, sans-serif; line-height: 24px; color: #333333; }
+
+/* special emphasis */
+.typotheme em, .typotheme i { background: #EFE6B6; padding: 3px; }
+.typotheme strong, .typotheme b { font-weight: bold; }
+.typotheme del { text-decoration: overline; }
+.typotheme acronym { border-bottom: 1px dotted #CCCCCC; cursor: help }
+.typotheme abbr { border-bottom: 1px dashed #CCCCCC; cursor: help }
+
+/* paragraphs */
+.typotheme p, .typotheme blockquote { margin: 0 0 15px 0; }
+.typotheme blockquote { margin: auto 20px; padding: 0 10px; border: 5px solid #E2E2E2; border-top: none; border-bottom: none; }
+    
+/* headings */
+.typotheme h1, .typotheme h2, .typotheme h3, .typotheme h4, .typotheme h5, .typotheme h6
+    { line-height: 1.3em; margin: 0px 0 7px 0; font-weight: bold; }
+.typotheme h1 a, .typotheme h2 a, .typotheme h3 a, .typotheme h4 a, .typotheme h5 a, .typotheme h6 a
+    { text-decoration: none; }
+.typotheme h1 .edit, .typotheme h2 .edit, .typotheme h3 .edit, .typotheme h4 .edit, .typotheme h5 .edit, .typotheme h6 .edit
+    { font-size: 80%; margin-left: 2px; position: relative; bottom: 1px; }
+/*
+    .typotheme h1 a, .typotheme h2 a, .typotheme h3 a, .typotheme h4 a, .typotheme h5 a, .typotheme h6 a
+    { text-decoration: none; }
+    .typotheme h3 a { border-bottom: 2px solid #c0c0c0; padding: 5px 0; color: #333; }
+    .typotheme h3 a:hover { border-bottom: 2px solid #333; }
+*/
+.typotheme .edit:hover { text-decoration: underline; }
+
+.typotheme h1 { font-size: 32px; letter-spacing: -0.04em; color: #4D4D4D; padding: 5px 0px 2px; }
+.typotheme h2 { font-size: 24px; color: #333; margin: 0 0 10px 0; }
+.typotheme h3 { font-size: 18px; color: #333; margin: 0 0 10px 0; }
+.typotheme h4 { font-size: 15px; color: #495055; background: #f1f1f1; padding: 7px 7px;  }
+.typotheme h5 { font-size: 15px; color: #495055; }
+
+/* lists */
+.typotheme ul, .typotheme ol { margin: 0 0 15px 25px; }
+.typotheme ul ul, .typotheme ol ol { margin-left: 22px; margin-bottom: 0;  }
+
+.typotheme ul { list-style: disc; }
+.typotheme ul ul { list-style: circle; }
+
+.typotheme ol { list-style: decimal; }
+.typotheme ol ol { list-style: lower-alpha; }
+
+.typotheme dl { margin-left: 10px; }
+.typotheme dt { width: 100px; float: left; clear: left; padding: 0 7px 0 0; text-align: left; }
+.typotheme dd { float: left; width: auto; }
+.typotheme dt+dd+dt, .typotheme dd+dt+dd  { border-top: 2px solid #e2e2e2;  }
+	/* Clearfix */
+	.typotheme dl:after { content: "."; display: block; height: 0; clear: both; visibility: hidden; }
+	* html .typotheme dl { height: 1%; }
+	*:first-child+html .typotheme dl { height: 1%; }
+	.typotheme dl { display: block; }
+
+	
+#body dl dt { width: 170px; float: left; clear: left; padding: 0 7px 0 0; text-align: left; }
+    #body dl dd { float: left;  }
+    #body dl.basic dt { width: 75px; }
+    #body dl dt, #body dl dd  { border-bottom: 2px dotted #D3D9E0; }
+
+
+/* tables */
+.typotheme table.basic { margin: 15px 0 15px 0; }
+    .typotheme table.basic caption { font-size: 110%; font-weight: bold; margin: 0 0 5px 0; display: none; }
+    .typotheme table.basic th, .typotheme .table td { color: #333333; padding: 10px 15px; }
+    .typotheme table.basic thead th { background-color: #D2EAF1; border-top: 1px solid #4BACC6; border-bottom: 1px solid #4BACC6; font-weight: bold; }
+    .typotheme table.basic td { border-bottom: 1px solid #4BACC6; }
+    .typotheme table.basic tbody td { padding: 5px; }
+    .typotheme table.basic tr.odd td { background-color: #E9F0F2; }
+    .typotheme table.form-table td { border-bottom: none; }
+
+/* images */
+.typotheme img { margin: 10px; }
+    .typotheme img.right, .typotheme img.alignright { float: right; margin: auto 0px auto 10px; }
+    .typotheme img.left, .typotheme img.alignleft { float: left; margin: auto 10px auto 0px;  }
+    .typotheme .wp-caption { border: 1px solid #d3d3d3; 
+         -webkit-border-radius: 3px; 
+         -moz-border-radius: 3px; 
+         -o-border-radius: 3px; 
+         border-radius: 3px; 
+    }
+    .typotheme .wp-caption.alignright { float: right; margin: auto 0px auto 10px; }
+    .typotheme .wp-caption.alignleft { float: left; margin: auto 10px auto 0px;  }
+    .typotheme .wp-caption a { display: block; }
+    .typotheme .wp-caption a img { display: block; margin: 5px; }
+    .typotheme .wp-caption .wp-caption-text { margin: 0 5px; text-align: center; }
+
+/* links */
+a { color: #0082b3; }
+a:hover { text-decoration: none; }

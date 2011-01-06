@@ -1,0 +1,21 @@
+/**
+ * Form theme
+ *
+ * @author      Ondrej Macoszek <ondra.macoszek@gmail.com>
+ * @copyright   (c) 2010, Ondrej Macoszek
+ */
+
+/* look of form elements */
+form { }
+	form td { padding: 5px 0; }
+	form fieldset { }
+	form legend { font-size: 22px; font-weight: bold; color: #333333; }
+	form label { display: block; margin-top: 3px; margin-right: 10px;  font-weight: bold; color: #333; font-size: 1em; }
+	form input { width: 300px; padding: 5px; font-size: 20px; }
+	form select { width: auto; padding: 5px; margin-top: 7px;}
+	form textarea { width: 300px; height: 100px; font-family: sans-serif; padding: 5px; margin-top: 5px;}
+	form textarea, .form input.text { border: 1px #c0c0c0 solid; }
+	form input[type=file] { font-size: 1em; }
+	form input[type=submit], .form input.submit, .form input[type=reset], .form input.reset { width: auto; padding: 4px 10px; font-size: 20px; }
+
+form .required label:after { content: '(required)'; color: #aaa; display: block; font-size: 10px; line-height: 2px; }

@@ -1,0 +1,81 @@
+/**
+ * Main layout stylesheet
+ *
+ * @project     importium
+ * @author      Ondrej Macoszek <ondra.macoszek@gmail.com>
+ * @copyright   (c) 2010, Ondrej Macoszek
+ *
+ * Tested compatibility
+ * Mac - Chrome, Firefox
+ */
+
+/**
+ * ----------------------------------------------------------------------------
+ *  Load basic components
+ * ----------------------------------------------------------------------------
+ */
+
+@import url('common.helpers.css');
+@import url('common.reset.css') screen;
+@import url('typotheme.css') screen;
+@import url('form.css') screen;
+@import url('print.css') print;
+
+/**
+ * ----------------------------------------------------------------------------
+ *  Main layout
+ * ----------------------------------------------------------------------------
+ */
+
+@media screen, projection {
+
+html { min-height: 100%; background: url('../img/page.bg2.png') repeat; }
+
+#page { width: 930px; margin: 30px auto; display: block; }
+
+#header { display: block; height: 120px; position: relative; background: white; border-radius: 15px; display: block; -moz-border-radius: 15px; }
+	#header h1 { color: black; font-size: 3em; font-weight: bold; position: absolute; top: 45px; left: 30px; }
+	#header h1 a { color: inherit; text-decoration: none; }
+	#header nav li { float: left; }
+	#header nav li a { display: block; padding: 10px; }
+	#header nav li a:hover { background-color: #f3f3f3; }
+	#header nav.main { position: absolute; top: 40px; right: 30px; }
+	#header .loggedUser { position: absolute; top: 42px; left: 260px; background: #f3f3f3; padding: 5px; }
+
+#body { padding: 25px; background-color: white; margin: 10px 0; opacity: 0.95; display: block; border-radius: 15px; -moz-border-radius: 15px;}
+	#body nav { border-bottom: 1px dotted #c0c0c0; border-top: 1px dotted #c0c0c0; }
+	#body nav li { float: left; }
+	#body nav li a { display: block; padding: 10px; }
+	#body nav li a:hover { background-color: #f3f3f3; }
+	#body .epicenter { margin-top: 10px; }
+	
+#footer { padding: 15px; background-color: #FFCB7D; display: block; border-radius: 15px; -moz-border-radius: 15px; }
+	#footer nav { float: left; }
+	#footer section.credits { text-align: center;}
+	#footer section.backend { float: right; }
+
+
+/* error and notice message boxes */
+.flash.error, .flash.info { width: auto; padding: 10px; margin: 5px 0;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    -o-border-radius: 5px;
+    border-radius: 5px;
+}
+.flash.error { background-color: #FCDFDC; border: 1px solid #E0AEA9; }
+.flash.info { background-color: #E4FCDC; border: 1px solid #B1E0A9; }
+
+/* component specific styles */
+ul.flash.error { list-style: none; }
+
+
+/* pagination */
+nav.pagination a { display: block; padding: 10px; float: left; }
+	nav.pagination:after { content: "."; display: block; height: 0; clear: both; visibility: hidden; }
+	* html nav.pagination { height: 1%; }
+	*:first-child+html nav.pagination { height: 1%; }
+	nav.pagination { display: block; }
+
+
+
+} /* /@media screen, projection */

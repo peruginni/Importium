@@ -1,0 +1,43 @@
+{block #epicenter}
+
+<h1>Folders</h1>
+
+
+{if count($folders) > 0}
+
+	<table class="basic">
+		<caption>Folders</caption>
+		<thead>
+			<tr>
+				<th>Title</th>
+				<th>Date Created</th>
+				<th>Actions</th>
+			</tr>
+		</thead>
+		<tbody>
+
+		{foreach $folders as $folder}
+		<tr>
+			<td>{$folder->getTitle()}</td>
+			<td>{$folder->getDateCreated()|date}</td>
+			<td><a href="{plink show, id => $folder->getId()}">Show files</a></td>
+		</tr>
+		{/foreach}
+
+		</tbody>
+	</table>
+
+
+	<nav class="pagination" n:ifset="$paginator">
+		<a href="{plink list, page => $paginator->getPrevious()}" n:if="$paginator->getPrevious()">&larr; Previous</a>
+		<a href="{plink list, page => $paginator->getNext()}" n:if="$paginator->getNext()">Next &rarr;</a>
+	</nav>
+
+
+{else}
+	
+	<p>No folders.</p>
+	
+{/if}
+
+
