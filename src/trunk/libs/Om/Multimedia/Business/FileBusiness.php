@@ -32,12 +32,12 @@ class FileBusiness extends BaseBusiness implements IFileBusiness
 	 */
 	public function  __construct()
 	{
-		$this->maxFileSize = 10485760; // 10MB
+		$this->setMaxFileSize(10485760); // 10MB
 
-		$this->storagePath = \WWW_DIR.'/data';
+		$this->setStoragePath(\WWW_DIR.'/data');
 
 		// initialize daos
-		$this->fileDao = $this->getDao('Om\Multimedia\IFileDao');
+		$this->fileDao = $this->inject('Om\Multimedia\IFileDao');
 	}
 
 
@@ -65,8 +65,10 @@ class FileBusiness extends BaseBusiness implements IFileBusiness
 	 */
 	public function remove($entity)
 	{
-		unlink($entity->getPath().'/'.$entity->getFilename().'.'.$entity->getExtension());
-		$this->getDefaultDao()->remove($entity);
+		if(!unlink($this->getStoragePath().'/'.$entity->getFilename().'.'.$entity->getExtension())) {
+			throw new \Om\LogicException('Cannot remove');
+		}
+		parent::remove($entity);
 	}
 
 
@@ -89,6 +91,7 @@ class FileBusiness extends BaseBusiness implements IFileBusiness
 
 	public function setStoragePath($storagePath)
 	{
+		$this->checkExistenceOfStorage($storagePath);
 		$this->storagePath = $storagePath;
 	}
 
@@ -110,42 +113,14 @@ class FileBusiness extends BaseBusiness implements IFileBusiness
 
 
 	/**
-	 * Get full storage path to file 
+	 * Get full storage path to file
 	 */
 	public function getFileFullPath(File $file)
 	{
-		return $this->formatFilePath($this->storagePath, $file->getFilename(), $file->getExtension());
-	}
-
-
-
-	/**
-	 * Unifies formating of filename path
-	 */
-	public function formatFilePath($path, $filename, $extension)
-	{
-		return $path.'/'.$filename.'.'.$extension;
+		return $this->getStoragePath().'/'.$file->getBasename();
 	}
 
 	
-
-	/**
-	 * Check existence of important directories for storage.
-	 * And if they are not present, will try to create.
-	 */
-	public function ensureExistenceOfStorage()
-	{
-		if(!file_exists($this->storagePath)) {
-			if(!mkdir($this->storagePath)) {
-				throw new LogicException(
-					'Cannot create storage directory',
-					self::CANNOT_ENSURE_STORAGE
-				);
-			}
-		}
-	}
-
-
 
 	/**
 	 * Handle uploaded file and store it according to information in given
@@ -155,7 +130,7 @@ class FileBusiness extends BaseBusiness implements IFileBusiness
 	{
 		// check existence of uploaded file
 		if(!$httpFile || $httpFile->getError() == UPLOAD_ERR_NO_FILE) {
-                        throw new UploadException("No file", UPLOAD_ERR_NO_FILE);
+                        throw new UploadException('No file', UPLOAD_ERR_NO_FILE);
                 }
 
 		// check other errors
@@ -225,16 +200,55 @@ class FileBusiness extends BaseBusiness implements IFileBusiness
 
 
 	/**
+	 * Find all files under given folder
+	 *
+	 * @return ArrayCollection
+	 */
+	public function findFilesByFolder(Folder $folder, IPaginator $paginator = null)
+	{
+		return $this->fileDao->findFilesByFolder($folder, $paginator);
+	}
+
+
+
+
+	/**
+	 *
+	 *  Helpers
+	 *
+	 */
+
+
+
+	/**
+	 * Check existence of important directories for storage.
+	 * And if they are not present, will try to create.
+	 */
+	protected function checkExistenceOfStorage()
+	{
+		if(!file_exists($this->storagePath)) {
+			if(!mkdir($this->storagePath)) {
+				throw new LogicException(
+					'Cannot create storage directory',
+					self::CANNOT_CREATE_STORAGE
+				);
+			}
+		}
+	}
+
+
+
+	/**
 	 * Create unique filename. Will test 10 times and then throw error.
 	 */
-	public function createUniqueFilename(File $file)
+	protected function createUniqueFilename(File $file)
 	{
 		$urilizedTitle = Text::urilize($file->getTitle());
 		$filename = $urilizedTitle;
 		$extension = $file->getExtension();
 
 		for($i = 0; $i < 10; $i++) {
-                        $fullPath = $this->formatFilePath($this->storagePath, $filename, $extension);
+                        $fullPath = $this->getStoragePath().'/'.$filename.'.'.$extension;
 
                         if(!file_exists($fullPath)) {
 				$file->setFilename($filename);
@@ -252,16 +266,6 @@ class FileBusiness extends BaseBusiness implements IFileBusiness
 	}
 
 
-
-	/**
-	 * Find all files under given folder
-	 *
-	 * @return ArrayCollection
-	 */
-	public function findFilesByFolder(Folder $folder, IPaginator $paginator = null)
-	{
-		return $this->fileDao->findFilesByFolder($folder, $paginator);
-	}
     
 }
 

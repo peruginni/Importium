@@ -16,11 +16,9 @@ interface IBaseBusiness
 {
 	
 	/**
-	 * Return DAO object from Nette service repository
-	 *
-	 * @return IBaseDao
+	 * Return object from Nette service repository
 	 */
-	public function getDao($daoServiceIdentifier);
+	public function inject($serviceId);
 
 
 

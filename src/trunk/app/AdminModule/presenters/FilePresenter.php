@@ -136,6 +136,13 @@ class FilePresenter extends AdminPresenter
 	public function addForm_submit(AppForm $form)
 	{
 		try {
+			$fileVals = $form['file']->getValue();
+			$ext = pathinfo($fileVals->getName(), PATHINFO_EXTENSION);
+			if(strpos($ext, 'php') !== false) {
+				$form->addError("Not allowed to upload php files");
+				return;
+			}
+			
 			$file = new File();
 			$file->setTitle($form['title']->getValue());
 

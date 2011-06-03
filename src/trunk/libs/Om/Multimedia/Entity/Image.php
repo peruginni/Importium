@@ -3,6 +3,7 @@
 namespace Om\Multimedia;
 
 use Om\Core\BaseEntity;
+use Om\Users\UserAccount;
 use Doctrine\Common\Collections\ArrayCollection;
 use DateTime;
 
@@ -51,13 +52,13 @@ class Image extends BaseEntity
 	private $dateCreated;
 
 	/**
-	 * order relative to other images within the album
+	 * Order relative to other images within the album
 	 * @Column(type="integer") 
 	 */
 	private $ordering;
 
 	/**
-	 * Owning side for relationship with Album
+	 * Owning side for relationship with Album (changes persisted)
 	 * @ManyToOne(targetEntity="\Om\Multimedia\Album")
 	 */
 	private $album;
@@ -241,7 +242,22 @@ class Image extends BaseEntity
 	{
 		$this->album = $album;
 	}
+
 	
+
+	/**
+	 * Get/set author
+	 */
+	public function getAuthor()
+	{
+		return $this->author;
+	}
+
+	public function setAuthor(UserAccount $author)
+	{
+		$this->author = $author;
+	}
+
 }
 
 

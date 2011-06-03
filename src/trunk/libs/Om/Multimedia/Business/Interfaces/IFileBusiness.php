@@ -16,8 +16,8 @@ interface IFileBusiness extends IBaseBusiness
 {
 	
 	/**#@+ error codes */
-	const CANNOT_ENSURE_STORAGE = 11;
-	const CANNOT_CREATE_UNIQUE_FILENAME = 12;
+	const CANNOT_CREATE_STORAGE = 10;
+	const CANNOT_CREATE_UNIQUE_FILENAME = 11;
 	/**#@-*/
 
 
@@ -46,34 +46,12 @@ interface IFileBusiness extends IBaseBusiness
 	public function getFileFullPath(File $file);
 
 
-	
-	/**
-	 * Unifies formating of filename path
-	 */
-	public function formatFilePath($path, $filename, $extension);
-
-
-
-	/**
-	 * Check existence of important directories for storage.
-	 * And if they are not present, will try to create.
-	 */
-	public function ensureExistenceOfStorage();
-
-
 
 	/**
 	 * Handle uploaded file and store it according to information in given
 	 * (not yet) stored entity.
 	 */
 	public function upload(File $file, HttpUploadedFile $httpFile);
-
-
-
-	/**
-	 * Create unique filename. Will test 10 times and then throw error.
-	 */
-	public function createUniqueFilename(File $file);
 
 
 

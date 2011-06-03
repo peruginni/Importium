@@ -24,13 +24,11 @@ abstract class BaseBusiness implements IBaseBusiness
 
 
 	/**
-	 * Return DAO object from Nette service repository
-	 *
-	 * @return IBaseDao
+	 * Return object from Nette service repository
 	 */
-	public function getDao($daoServiceIdentifier)
+	public function inject($serviceId)
 	{
-		return Environment::getService($daoServiceIdentifier);
+		return Environment::getService($serviceId);
 	}
 
 

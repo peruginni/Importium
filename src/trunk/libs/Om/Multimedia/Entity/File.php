@@ -3,6 +3,7 @@
 namespace Om\Multimedia;
 
 use Om\Core\BaseEntity;
+use Om\Users\UserAccount;
 use DateTime;
 
 /**
@@ -22,13 +23,6 @@ class File extends BaseEntity
 	/** @Column(type="string") */
 	private $title;
 
-	/**
-	* relative to storage direcory (specified in model),
-	* but universal part for both editing and presenting
-	* @Column(type="text")
-	*/
-	private $path;
-
 	/** @Column(type="string") */
 	private $filename;
 
@@ -39,10 +33,16 @@ class File extends BaseEntity
 	private $dateCreated;
 
 	/**
-	 * Owning side for relationship with Folder
+	 * Owning side for relationship with Folder (changes persisted)
 	 * @ManyToOne(targetEntity="\Om\Multimedia\Folder")
 	 */
 	private $folder;
+
+	/**
+	 * Owning side for relationship with UserAccount (changes persisted)
+	 * @ManyToOne(targetEntity="\Om\Users\UserAccount")
+	 */
+	private $author;
 
 
 
@@ -89,22 +89,7 @@ class File extends BaseEntity
 		$this->title = (string) $title;
 	}
 
-
-
-	/**
-	 * Get/set path
-	 */
-	public function getPath()
-	{
-		return $this->path;
-	}
-
-	public function setPath($path)
-	{
-		$this->path = (string) $path;
-	}
-
-
+	
 
 	/**
 	 * Get/set filename
@@ -167,11 +152,26 @@ class File extends BaseEntity
 
 
 	/**
-	 * Get full path to file (path plus filename and extension)
+	 * Get/set author
 	 */
-	public function getFullPath()
+	public function getAuthor()
 	{
-		return $this->getPath().'/'.$this->getFilename().'.'.$this->getExtension();
+		return $this->author;
+	}
+
+	public function setAuthor(UserAccount $author)
+	{
+		$this->author = $author;
+	}
+
+
+
+	/**
+	 * Get filename and extension
+	 */
+	public function getBasename()
+	{
+		return $this->getFilename().'.'.$this->getExtension();
 	}
     
 }

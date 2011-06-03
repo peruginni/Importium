@@ -30,7 +30,7 @@ class UserAccountBusiness extends BaseBusiness implements IUserAccountBusiness, 
 	public function  __construct()
 	{
 		// initialize daos
-		$this->userAccountDao = $this->getDao('Om\Users\IUserAccountDao');
+		$this->userAccountDao = $this->inject('Om\Users\IUserAccountDao');
 	}
 
 

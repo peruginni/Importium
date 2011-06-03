@@ -40,8 +40,7 @@ abstract class BaseDao implements IBaseDao
 	 */
 	public function __construct()
 	{
-		$this->getEntityManager();
-		$this->getCache();
+		// empty
 	}
 
 
@@ -121,8 +120,9 @@ abstract class BaseDao implements IBaseDao
 	 */
 	public function persist($entity)
 	{
-		$this->em->persist($entity);
-		$this->em->flush();
+		$em = $this->getEntityManager();
+		$em->persist($entity);
+		$em->flush();
 	}
 
 
@@ -132,8 +132,9 @@ abstract class BaseDao implements IBaseDao
 	 */
 	public function remove($entity)
 	{
-		$this->em->remove($entity);
-		$this->em->flush();
+		$em = $this->getEntityManager();
+		$em->remove($entity);
+		$em->flush();
 	}
 
 
@@ -143,7 +144,8 @@ abstract class BaseDao implements IBaseDao
 	 */
 	public function findById($id)
 	{
-		return $this->em->getRepository($this->getEntityName())->find($id);
+		$em = $this->getEntityManager();
+		return $em->getRepository($this->getEntityName())->find($id);
 	}
 
 
@@ -181,7 +183,8 @@ abstract class BaseDao implements IBaseDao
 	 */
 	protected function createQueryBuilder()
 	{
-		$qb = $this->em->createQueryBuilder();
+		$em = $this->getEntityManager();
+		$qb = $em->createQueryBuilder();
 		$qb->select('e');
 		$qb->from($this->getEntityName(), 'e');
 		return $qb;

@@ -24,7 +24,7 @@ class FolderBusiness extends BaseBusiness implements IFolderBusiness
 	public function  __construct()
 	{
 		// initialize daos
-		$this->folderDao = $this->getDao('Om\Multimedia\IFolderDao');
+		$this->folderDao = $this->inject('Om\Multimedia\IFolderDao');
 	}
 
 
