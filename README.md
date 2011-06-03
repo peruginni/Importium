@@ -11,8 +11,8 @@ Importium je aplikace pro správu souborů. Umožňuje přihlášenému uživate
 
 ### Případy užití
 
-![Soubory](https://github.com/peruginni/Importium/raw/master/docs/usecase-files)
-![Složky](https://github.com/peruginni/Importium/raw/master/docs/usecase-folders)
+![Soubory](https://github.com/peruginni/Importium/raw/master/docs/usecase-files.png)
+![Složky](https://github.com/peruginni/Importium/raw/master/docs/usecase-folders.png)
 
 ## Návrh 
 
