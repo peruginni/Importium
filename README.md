@@ -16,7 +16,7 @@ Importium je aplikace pro správu souborů. Umožňuje přihlášenému uživate
 
 ## Návrh 
 
-### Arhitektura
+### Architektura
 
 Aplikace je rozvrstvená do tří důsledně oddělených vrstev. Vrstvy vzájemně komunikují 
 prostřednictvím rozhraní. Instance tříd, které implementují tyto rozhraní se neinstancují 
@@ -36,8 +36,7 @@ byznys procesu (např. vložení nového souboru neznamená jen uložení inform
 o souboru do databáze, ale i fyzické uložení souboru na filesystém). Často také 
 spojuje činnosti více persistenčních objektů dohromady (např. uložení informací 
 o souboru, ale také uložení informace o zařazení souboru pod určitou složku). 
-V budoucnu také prostor pro ověřování práv 
-uživatele k provedení příslušné akce.
+V budoucnu také prostor pro ověřování práv uživatele k provedení příslušné akce.
 
 
 
@@ -82,7 +81,7 @@ problém vyměnit Doctrine za dibi(+ objekty entit). Ovšem vždy se mi velmi l�
 jakým v javě funguje JPA, takže když jsem hledal něco podobného v php a narazil 
 na Doctrine, neváhal jsem ji vyzkoušet. 
 
-> Aktualizace: S odstupem času dospívám k názoru, že příště by bylo dobré vrstvu DAO 
+> Aktualizace: S odstupem času myslím, že příště by bylo dobré vrstvu DAO 
 sloučit přímo s byznys vrstvou, protože jejich oddělení zde nepřináší výrazný užitek. 
 Čas věnovaný oddělování by bylo příště lepší využít pro unit testy. Také adresářová 
 struktura rozdělující zvlášť dao, business a entity objekty mi příjde zbytečná 
