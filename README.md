@@ -18,6 +18,8 @@ Importium je aplikace pro správu souborů. Umožňuje přihlášenému uživate
 
 ### Architektura
 
+![Architektura](https://github.com/peruginni/Importium/raw/master/docs/architecture.png)
+
 Aplikace je rozvrstvená do tří důsledně oddělených vrstev. Vrstvy vzájemně komunikují 
 prostřednictvím rozhraní. Instance tříd, které implementují tyto rozhraní se neinstancují 
 přímo v každé vrstvě, ale jsou úsporně vkládány pomocí principu dependency injection, 
