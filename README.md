@@ -5,8 +5,6 @@ Importium
 
 Importium je aplikace pro správu souborů. Umožňuje přihlášenému uživateli přidávat a spravovat soubory. Soubory může pro přehlednost také organizovat do složek. Obyčejný návštěvník může jen prohlížet složky, kde jsou soubory uloženy, a případně soubory stahovat.
 
-* [Živá ukázka aplikace](http://importium.macoszek.cz/)
-
 ## Analýza
 
 ### Případy užití
